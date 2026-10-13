@@ -13,9 +13,16 @@ if ($aksi == 'tambah') {
     
     $query = "INSERT INTO menu (kd_menu, nama_menu, kategori, harga, stock, deskripsi) 
               VALUES ('$kd', '$nama', '$kategori', $harga, $stock, '$deskripsi')";
-    mysqli_query($koneksi, $query);
     
-    header("Location: index.php?pesan=Data berhasil ditambahkan");
+    if (mysqli_query($koneksi, $query)) {
+        $_SESSION['pesan'] = "Data berhasil ditambahkan";
+        $_SESSION['tipe'] = "sukses";
+    } else {
+        $_SESSION['pesan'] = "Gagal menambahkan data";
+        $_SESSION['tipe'] = "error";
+    }
+    header("Location: index.php");
+    exit;
     
 } elseif ($aksi == 'edit') {
     $id = $_POST['id'];
@@ -34,8 +41,15 @@ if ($aksi == 'tambah') {
               stock=$stock, 
               deskripsi='$deskripsi' 
               WHERE id=$id";
-    mysqli_query($koneksi, $query);
     
-    header("Location: index.php?pesan=Data berhasil diupdate");
+    if (mysqli_query($koneksi, $query)) {
+        $_SESSION['pesan'] = "Data berhasil diupdate";
+        $_SESSION['tipe'] = "sukses";
+    } else {
+        $_SESSION['pesan'] = "Gagal mengupdate data";
+        $_SESSION['tipe'] = "error";
+    }
+    header("Location: index.php");
+    exit;
 }
 ?>

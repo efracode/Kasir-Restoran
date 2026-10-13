@@ -1,10 +1,6 @@
 <?php
 require 'config/database.php';
 
-if (isset($_GET['pesan'])) {
-    echo "<p style='color:green;'>$_GET[pesan]</p>";
-}
-
 $query = "SELECT * FROM menu ORDER BY id DESC";
 $result = mysqli_query($koneksi, $query);
 ?>
@@ -23,9 +19,25 @@ $result = mysqli_query($koneksi, $query);
         .btn-tambah { background: green; }
         .btn-edit { background: orange; }
         .btn-hapus { background: red; }
+        .alert { padding: 12px; border-radius: 5px; margin-bottom: 15px; }
+        .alert-sukses { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
     </style>
 </head>
 <body>
+
+<?php
+// Tampilkan flash message dari Session
+if (isset($_SESSION['pesan'])) {
+    $tipe = $_SESSION['tipe'] ?? 'sukses';
+    echo "<div class='alert alert-$tipe'>";
+    echo $_SESSION['pesan'];
+    echo "</div>";
+    // Hapus pesan setelah ditampilkan (flash message)
+    unset($_SESSION['pesan']);
+    unset($_SESSION['tipe']);
+}
+?>
 
 <h2>Daftar Menu Restoran</h2>
 <a href="tambah.php" class="btn btn-tambah">+ Tambah Menu</a>
