@@ -11,18 +11,24 @@ if ($aksi == 'tambah') {
     $stock = $_POST['stock'];
     $deskripsi = $_POST['deskripsi'];
     
-    $query = "INSERT INTO menu (kd_menu, nama_menu, kategori, harga, stock, deskripsi) 
-              VALUES ('$kd', '$nama', '$kategori', $harga, $stock, '$deskripsi')";
-    
-    if (mysqli_query($koneksi, $query)) {
-        $_SESSION['pesan'] = "Data berhasil ditambahkan";
-        $_SESSION['tipe'] = "sukses";
-    } else {
-        $_SESSION['pesan'] = "Gagal menambahkan data";
-        $_SESSION['tipe'] = "error";
+    if($harga < 0 || $stock < 0){
+            $_SESSION['pesan'] = "Gagal: Harga dan Stock harus lebih atau sama dengan 0.";
+            $_SESSION['tipe'] = "error";
+    }else{
+        $query = "INSERT INTO menu (kd_menu, nama_menu, kategori, harga, stock, deskripsi) 
+                VALUES ('$kd', '$nama', '$kategori', $harga, $stock, '$deskripsi')";
+        
+        if (mysqli_query($koneksi, $query)) {
+            $_SESSION['pesan'] = "Data berhasil ditambahkan";
+            $_SESSION['tipe'] = "sukses";
+        } else {
+            $_SESSION['pesan'] = "Gagal menambahkan data";
+            $_SESSION['tipe'] = "error";
+        }
     }
     header("Location: index.php");
     exit;
+
     
 } elseif ($aksi == 'edit') {
     $id = $_POST['id'];
@@ -32,23 +38,29 @@ if ($aksi == 'tambah') {
     $harga = $_POST['harga'];
     $stock = $_POST['stock'];
     $deskripsi = $_POST['deskripsi'];
-    
-    $query = "UPDATE menu SET 
-              kd_menu='$kd', 
-              nama_menu='$nama', 
-              kategori='$kategori', 
-              harga=$harga, 
-              stock=$stock, 
-              deskripsi='$deskripsi' 
-              WHERE id=$id";
-    
-    if (mysqli_query($koneksi, $query)) {
-        $_SESSION['pesan'] = "Data berhasil diupdate";
-        $_SESSION['tipe'] = "sukses";
-    } else {
-        $_SESSION['pesan'] = "Gagal mengupdate data";
+
+    if($harga < 0 || $stock < 0){
+        $_SESSION['pesan'] = "Gagal: Harga dan Sock harus lebih atau sama dengan 0.";
         $_SESSION['tipe'] = "error";
+    }else{
+        $query = "UPDATE menu SET 
+                kd_menu='$kd', 
+                nama_menu='$nama', 
+                kategori='$kategori', 
+                harga=$harga, 
+                stock=$stock, 
+                deskripsi='$deskripsi' 
+                WHERE id=$id";
+
+        if (mysqli_query($koneksi, $query)) {
+            $_SESSION['pesan'] = "Data berhasil diupdate";
+            $_SESSION['tipe'] = "sukses";
+        } else {
+            $_SESSION['pesan'] = "Gagal mengupdate data";
+            $_SESSION['tipe'] = "error";
+        }
     }
+
     header("Location: index.php");
     exit;
 }
