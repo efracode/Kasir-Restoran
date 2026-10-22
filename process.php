@@ -19,11 +19,13 @@ if ($aksi == 'tambah') {
                 VALUES ('$kd', '$nama', '$kategori', $harga, $stock, '$deskripsi')";
         
         if (mysqli_query($koneksi, $query)) {
-            $_SESSION['pesan'] = "Data berhasil ditambahkan";
-            $_SESSION['tipe'] = "sukses";
+    header("Location: thx.php");
+    exit();
         } else {
             $_SESSION['pesan'] = "Gagal menambahkan data";
             $_SESSION['tipe'] = "error";
+            header("Location: index.php");
+            exit();
         }
     }
     header("Location: index.php");
@@ -53,11 +55,13 @@ if ($aksi == 'tambah') {
                 WHERE id=$id";
 
         if (mysqli_query($koneksi, $query)) {
-            $_SESSION['pesan'] = "Data berhasil diupdate";
-            $_SESSION['tipe'] = "sukses";
+            header("Location: thx.php");
+            exit();
         } else {
             $_SESSION['pesan'] = "Gagal mengupdate data";
             $_SESSION['tipe'] = "error";
+            header("Location: index.php");
+            exit();
         }
     }
 
