@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $koneksi = mysqli_connect("localhost", "root", "", "kasir_restoran");
 
