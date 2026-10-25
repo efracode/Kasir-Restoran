@@ -1,573 +1,163 @@
+<?php
+require 'config/database.php';
 
-<?php require 'config/database.php'; ?>
+$old = $_SESSION['form_data'] ?? [];
+unset($_SESSION['form_data']);
 
+function e($value)
+{
+    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Menu | MenuHub</title>
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <style>
-        :root {
-            --green: #16a34a;
-            --green-dark: #15803d;
-            --green-light: #dcfce7;
-            --text: #172033;
-            --muted: #64748b;
-            --border: #e2e8f0;
-            --background: #f6f8fb;
-            --white: #ffffff;
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            margin: 0;
-            font-family: 'Inter', Arial, sans-serif;
-            color: var(--text);
-            background: var(--background);
-            font-size: 14px;
-        }
-
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .layout {
-            min-height: 100vh;
-        }
-
-        /* SIDEBAR */
-        .sidebar {
-            width: 210px;
-            background: var(--white);
-            border-right: 1px solid var(--border);
-            position: fixed;
-            inset: 0 auto 0 0;
-            display: flex;
-            flex-direction: column;
-            padding: 24px 15px;
-            z-index: 10;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 0 9px;
-            margin-bottom: 42px;
-        }
-
-        .brand-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 11px;
-            background: var(--green);
-            color: white;
-            display: grid;
-            place-items: center;
-            font-size: 19px;
-            font-weight: 800;
-        }
-
-        .brand-name {
-            font-size: 17px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        .brand-subtitle {
-            color: var(--muted);
-            font-size: 9px;
-            margin-top: 4px;
-        }
-
-        .nav-label {
-            font-size: 10px;
-            font-weight: 700;
-            color: #94a3b8;
-            letter-spacing: 0.6px;
-            margin: 0 9px 12px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            padding: 13px 12px;
-            margin-bottom: 5px;
-            border-radius: 10px;
-            color: #526178;
-            font-weight: 500;
-            transition: 0.2s;
-        }
-
-        .nav-link:hover {
-            background: #f1f5f9;
-        }
-
-        .nav-link.active {
-            background: var(--green-light);
-            color: var(--green-dark);
-            font-weight: 700;
-        }
-
-        .nav-icon {
-            width: 15px;
-            text-align: center;
-        }
-
-        .sidebar-bottom {
-            margin-top: auto;
-            padding: 17px 9px 0;
-            border-top: 1px solid var(--border);
-            line-height: 1.7;
-            color: var(--muted);
-            font-size: 11px;
-        }
-
-        .sidebar-bottom strong {
-            color: #475569;
-        }
-
-        /* MAIN CONTENT */
-        .main {
-            margin-left: 210px;
-            min-height: 100vh;
-        }
-
-        .topbar {
-            min-height: 68px;
-            background: var(--white);
-            border-bottom: 1px solid var(--border);
-            padding: 0 30px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-        }
-
-        .breadcrumb {
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        .breadcrumb strong {
-            color: var(--text);
-        }
-
-        .admin {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .avatar {
-            height: 34px;
-            width: 34px;
-            border-radius: 50%;
-            background: var(--green-light);
-            color: var(--green-dark);
-            display: grid;
-            place-items: center;
-            font-weight: 800;
-        }
-
-        .admin-name {
-            font-size: 11px;
-            font-weight: 700;
-        }
-
-        .admin-role {
-            font-size: 10px;
-            color: var(--muted);
-            margin-top: 4px;
-        }
-
-        .content {
-            max-width: 1120px;
-            padding: 32px;
-            margin: 0 auto;
-        }
-
-        .page-heading {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .page-heading h1 {
-            font-size: 25px;
-            letter-spacing: -0.8px;
-            margin: 0 0 9px;
-        }
-
-        .page-heading p {
-            margin: 0;
-            color: var(--muted);
-            line-height: 1.7;
-            font-size: 13px;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: white;
-            border: 1px solid var(--border);
-            padding: 11px 15px;
-            border-radius: 9px;
-            color: #475569;
-            font-weight: 600;
-            white-space: nowrap;
-            transition: 0.2s;
-        }
-
-        .back-link:hover {
-            border-color: #86efac;
-            color: var(--green-dark);
-        }
-
-        /* FORM CARD */
-        .form-card {
-            background: var(--white);
-            border: 1px solid var(--border);
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 5px 20px rgba(15, 23, 42, 0.025);
-        }
-
-        .card-heading {
-            padding: 22px 25px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .card-heading h2 {
-            font-size: 16px;
-            margin: 0 0 7px;
-        }
-
-        .card-heading p {
-            font-size: 12px;
-            color: var(--muted);
-            margin: 0;
-            line-height: 1.6;
-        }
-
-        .form-body {
-            padding: 26px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 22px 24px;
-        }
-
-        .field {
-            min-width: 0;
-        }
-
-        .field.full {
-            grid-column: 1 / -1;
-        }
-
-        label {
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            color: #334155;
-            margin-bottom: 9px;
-        }
-
-        .required {
-            color: #dc2626;
-        }
-
-        .input,
-        select,
-        textarea {
-            display: block;
-            width: 100%;
-            border: 1px solid #cbd5e1;
-            background: white;
-            color: var(--text);
-            padding: 12px 13px;
-            border-radius: 9px;
-            font: inherit;
-            font-size: 13px;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .input,
-        select {
-            min-height: 44px;
-        }
-
-        .input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--green);
-            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
-        }
-
-        textarea {
-            min-height: 110px;
-            resize: vertical;
-            line-height: 1.6;
-        }
-
-        .helper {
-            display: block;
-            color: #94a3b8;
-            font-size: 11px;
-            margin-top: 7px;
-            line-height: 1.5;
-        }
-
-        .form-footer {
-            padding: 19px 26px;
-            background: #fafbfc;
-            border-top: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
-        }
-
-        .footer-note {
-            color: var(--muted);
-            font-size: 11px;
-            line-height: 1.6;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .btn {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            border-radius: 9px;
-            padding: 12px 17px;
-            border: 1px solid transparent;
-            font: inherit;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn-cancel {
-            background: white;
-            border-color: var(--border);
-            color: #475569;
-        }
-
-        .btn-cancel:hover {
-            background: #f1f5f9;
-        }
-
-        .btn-save {
-            background: var(--green);
-            color: white;
-            box-shadow: 0 3px 8px rgba(22, 163, 74, 0.14);
-        }
-
-        .btn-save:hover {
-            background: var(--green-dark);
-            transform: translateY(-1px);
-        }
-
-        .footer {
-            text-align: center;
-            padding: 25px 15px;
-            color: var(--muted);
-            font-size: 11px;
-        }
-
-        @media (max-width: 800px) {
-            .sidebar {
-                width: 68px;
-                padding: 20px 9px;
-            }
-
-            .brand {
-                padding: 0;
-                justify-content: center;
-                margin-bottom: 35px;
-            }
-
-            .brand-text,
-            .nav-label,
-            .nav-text,
-            .sidebar-bottom {
-                display: none;
-            }
-
-            .nav-link {
-                justify-content: center;
-                padding: 14px 5px;
-            }
-
-            .nav-icon {
-                font-size: 16px;
-            }
-
-            .main {
-                margin-left: 68px;
-            }
-
-            .topbar {
-                padding: 0 18px;
-            }
-
-            .content {
-                padding: 25px 18px;
-            }
-        }
-
-        @media (max-width: 560px) {
-            .content {
-                padding: 22px 12px;
-            }
-
-            .page-heading {
-                flex-direction: column;
-            }
-
-            .page-heading h1 {
-                font-size: 22px;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-                gap: 19px;
-            }
-
-            .field.full {
-                grid-column: auto;
-            }
-
-            .form-body {
-                padding: 20px 16px;
-            }
-
-            .card-heading {
-                padding: 19px 16px;
-            }
-
-            .form-footer {
-                padding: 17px 16px;
-                align-items: stretch;
-                flex-direction: column;
-            }
-
-            .form-actions {
-                width: 100%;
-            }
-
-            .form-actions .btn {
-                flex: 1;
-            }
-
-            .admin-role {
-                display: none;
-            }
-        }
-    </style>
+    <title>Tambah Menu | Kasir Restoran</title>
+    <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
 <body>
-<div class="layout">
+<div class="dashboard-layout">
 
     <aside class="sidebar">
         <a href="index.php" class="brand">
-            <div class="brand-icon">M</div>
-            <div class="brand-text">
-                <div class="brand-name">MenuHub</div>
-                <div class="brand-subtitle">Restaurant Management</div>
+            <div class="brand-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/>
+                    <path d="M7 2v20"/>
+                    <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>
+                </svg>
+            </div>
+            <div>
+                <div class="brand-name">Kasir Restoran</div>
+                <div class="brand-caption">Sistem POS & Penjualan</div>
             </div>
         </a>
 
         <div class="nav-label">MENU UTAMA</div>
 
-        <a href="index.php" class="nav-link">
-            <span class="nav-icon">▦</span>
-            <span class="nav-text">Dashboard</span>
+        <a href="kasir.php" class="nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="20" height="14" x="2" y="5" rx="2"/>
+                <line x1="2" x2="22" y1="10" y2="10"/>
+            </svg>
+            <span>Kasir (POS)</span>
+            <span class="nav-link-badge">LIVE</span>
         </a>
 
         <a href="index.php" class="nav-link">
-            <span class="nav-icon">☷</span>
-            <span class="nav-text">Daftar Menu</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="7" height="9" x="3" y="3" rx="1.5"/>
+                <rect width="7" height="5" x="14" y="3" rx="1.5"/>
+                <rect width="7" height="9" x="14" y="12" rx="1.5"/>
+                <rect width="7" height="5" x="3" y="16" rx="1.5"/>
+            </svg>
+            <span>Dashboard & Riwayat</span>
+        </a>
+
+        <a href="index.php#menuTable" class="nav-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" x2="20" y1="6" y2="6"/>
+                <line x1="4" x2="20" y1="12" y2="12"/>
+                <line x1="4" x2="20" y1="18" y2="18"/>
+            </svg>
+            <span>Kelola Menu</span>
         </a>
 
         <a href="tambah.php" class="nav-link active">
-            <span class="nav-icon">＋</span>
-            <span class="nav-text">Tambah Menu</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" x2="12" y1="8" y2="16"/>
+                <line x1="8" x2="16" y1="12" y2="12"/>
+            </svg>
+            <span>Tambah Menu</span>
         </a>
 
-        <div class="sidebar-bottom">
-            <strong>MenuHub Admin</strong><br>
-            Pengelolaan menu restoran
+        <div class="sidebar-footer">
+            <strong>Kasir Restoran</strong>
+            <p>Aplikasi Kasir & Pemesanan</p>
         </div>
     </aside>
 
-    <main class="main">
+    <div class="main-area">
 
         <header class="topbar">
             <div class="breadcrumb">
-                Halaman / <strong>Tambah Menu</strong>
+                <a href="index.php" style="color: inherit;">Halaman</a> / <strong>Tambah Menu Restoran</strong>
             </div>
 
-            <div class="admin">
-                <div class="avatar">A</div>
+            <div class="profile">
+                <div class="profile-avatar">K</div>
                 <div>
-                    <div class="admin-name">Administrator</div>
-                    <div class="admin-role">Pengelola Menu</div>
+                    <div class="profile-name">Kasir 1</div>
+                    <div class="profile-role">Petugas Transaksi</div>
                 </div>
             </div>
         </header>
 
-        <div class="content">
+        <main class="dashboard-content">
 
-            <div class="page-heading">
+            <div class="page-header">
                 <div>
-                    <h1>Tambah Menu Baru</h1>
-                    <p>
-                        Tambahkan data makanan atau minuman baru
-                        ke dalam menu restoranmu.
+                    <h1 class="page-title">Tambah Menu Baru</h1>
+                    <p class="welcome-text">
+                        Tambahkan item makanan, minuman, snack, atau dessert ke dalam daftar menu kasir restoran.
                     </p>
                 </div>
 
                 <a href="index.php" class="back-link">
-                    ← Kembali ke Dashboard
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" x2="5" y1="12" y2="12"/>
+                        <polyline points="12 19 5 12 12 5"/>
+                    </svg>
+                    <span>Kembali ke Dashboard</span>
                 </a>
             </div>
+
+            <?php if (isset($_SESSION['pesan'])): ?>
+                <?php
+                $tipePesan = $_SESSION['tipe'] ?? 'error';
+                $kelasPesan = $tipePesan === 'error' ? 'alert-error' : 'alert-sukses';
+                ?>
+                <div class="alert <?= e($kelasPesan) ?>" role="alert">
+                    <div class="alert-body">
+                        <?php if ($tipePesan === 'error'): ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" x2="12" y1="8" y2="12"/>
+                                <line x1="12" x2="12.01" y1="16" y2="16"/>
+                            </svg>
+                        <?php else: ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                        <?php endif; ?>
+                        <span><?= e($_SESSION['pesan']) ?></span>
+                    </div>
+                    <button
+                        type="button"
+                        class="alert-close"
+                        onclick="this.closest('.alert').remove()"
+                        aria-label="Tutup notifikasi">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" x2="6" y1="6" y2="18"/>
+                            <line x1="6" x2="18" y1="6" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+                <?php unset($_SESSION['pesan'], $_SESSION['tipe']); ?>
+            <?php endif; ?>
 
             <section class="form-card">
 
                 <div class="card-heading">
                     <h2>Informasi Menu</h2>
                     <p>
-                        Lengkapi informasi di bawah ini.
-                        Kolom bertanda <span class="required">*</span>
-                        wajib diisi.
+                        Lengkapi informasi menu di bawah ini. Kolom dengan tanda <span class="required">*</span> wajib diisi.
                     </p>
                 </div>
 
@@ -586,12 +176,13 @@
                                     type="text"
                                     id="kd_menu"
                                     name="kd_menu"
+                                    value="<?= e($old['kd_menu'] ?? '') ?>"
                                     placeholder="Contoh: MN001"
                                     maxlength="20"
                                     required
                                 >
                                 <small class="helper">
-                                    Gunakan kode unik untuk setiap menu.
+                                    Gunakan kode unik untuk membedakan tiap menu di kasir.
                                 </small>
                             </div>
 
@@ -604,6 +195,7 @@
                                     type="text"
                                     id="nama_menu"
                                     name="nama_menu"
+                                    value="<?= e($old['nama_menu'] ?? '') ?>"
                                     placeholder="Contoh: Nasi Goreng Spesial"
                                     maxlength="100"
                                     required
@@ -614,49 +206,53 @@
                                 <label for="kategori">
                                     Kategori <span class="required">*</span>
                                 </label>
+                                <?php $selectedKat = $old['kategori'] ?? ''; ?>
                                 <select id="kategori" name="kategori" required>
-                                    <option value="Makanan">Makanan</option>
-                                    <option value="Minuman">Minuman</option>
-                                    <option value="Snack">Snack</option>
-                                    <option value="Dessert">Dessert</option>
+                                    <option value="" disabled <?= empty($selectedKat) ? 'selected' : '' ?>>Pilih Kategori</option>
+                                    <option value="Makanan" <?= $selectedKat === 'Makanan' ? 'selected' : '' ?>>Makanan</option>
+                                    <option value="Minuman" <?= $selectedKat === 'Minuman' ? 'selected' : '' ?>>Minuman</option>
+                                    <option value="Snack" <?= $selectedKat === 'Snack' ? 'selected' : '' ?>>Snack</option>
+                                    <option value="Dessert" <?= $selectedKat === 'Dessert' ? 'selected' : '' ?>>Dessert</option>
                                 </select>
                             </div>
 
                             <div class="field">
                                 <label for="harga">
-                                    Harga (Rp) <span class="required">*</span>
+                                    Harga Satuan (Rp) <span class="required">*</span>
                                 </label>
                                 <input
                                     class="input"
                                     type="number"
                                     id="harga"
                                     name="harga"
+                                    value="<?= e($old['harga'] ?? '') ?>"
                                     placeholder="Contoh: 25000"
                                     min="0"
                                     step="1"
                                     required
                                 >
                                 <small class="helper">
-                                    Masukkan harga dalam rupiah tanpa tanda titik.
+                                    Masukkan nominal harga tanpa titik atau koma.
                                 </small>
                             </div>
 
                             <div class="field">
                                 <label for="stock">
-                                    Stok Menu <span class="required">*</span>
+                                    Stok Awal di Kasir <span class="required">*</span>
                                 </label>
                                 <input
                                     class="input"
                                     type="number"
                                     id="stock"
                                     name="stock"
+                                    value="<?= e($old['stock'] ?? '') ?>"
                                     placeholder="Contoh: 20"
                                     min="0"
                                     step="1"
                                     required
                                 >
                                 <small class="helper">
-                                    Masukkan jumlah stok yang tersedia.
+                                    Jumlah porsi atau unit yang siap disajikan.
                                 </small>
                             </div>
 
@@ -665,10 +261,10 @@
                                 <textarea
                                     id="deskripsi"
                                     name="deskripsi"
-                                    placeholder="Tuliskan deskripsi singkat menu..."
-                                ></textarea>
+                                    placeholder="Tuliskan deskripsi singkat menu, bahan utama, atau tingkat kepedasan..."
+                                ><?= e($old['deskripsi'] ?? '') ?></textarea>
                                 <small class="helper">
-                                    Opsional. Jelaskan bahan, rasa, atau keunikan menu.
+                                    Opsional. Informasi tambahan untuk staf kasir atau pelanggan.
                                 </small>
                             </div>
 
@@ -677,8 +273,7 @@
 
                     <div class="form-footer">
                         <div class="footer-note">
-                            Pastikan informasi menu sudah benar<br>
-                            sebelum menyimpan data.
+                            Pastikan informasi menu sudah tepat sebelum menyimpan data.
                         </div>
 
                         <div class="form-actions">
@@ -686,7 +281,10 @@
                                 Batal
                             </a>
                             <button type="submit" class="btn btn-save">
-                                ✓ Simpan Menu
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                                <span>Simpan Menu</span>
                             </button>
                         </div>
                     </div>
@@ -694,13 +292,15 @@
 
             </section>
 
-            <footer class="footer">
-                MenuHub © 2026 — Restaurant Management System
-            </footer>
+            <div class="site-footer">
+                Kasir Restoran &copy; <?= date('Y') ?> — Sistem POS & Manajemen Menu Restoran
+            </div>
 
-        </div>
-    </main>
+        </main>
+
+    </div>
 
 </div>
 </body>
+
 </html>
